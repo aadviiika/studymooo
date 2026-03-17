@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Upload Resource — StudyMoo{% endblock %}
+
+{% block content %}
+<div class="container auth-page">
+  <div class="upload-layout">
+
+    <div class="upload-form-card">
+      <div class="form-header">
+        <h1>Upload a Resource</h1>
+        <p>Share your notes, papers, and materials with your classmates.</p>
+      </div>
+
+      <form method="POST" enctype="multipart/form-data" id="uploadForm">
+        {% csrf_token %}
+
+        <!-- datalist for subject suggestions -->
+        <datalist id="subject-suggestions">
+          <option value="Lecture Notes">
+          <option value="Assignment">
+          <option value="Previous Exam Paper">
+          <option value="Textbook / Reference">
+          <option value="Project">
+          <option value="Lab Report">
+          <option value="Tutorial Sheet">
+          <option value="Cheat Sheet">
+          <option value="Other">
+        </datalist>
+
+        {% for field in form %}
+        <div class="form-group {% if field.errors %}has-error{% endif %}">
+          <label class="form-label" for="{{ field.id_for_label }}">
+            {{ field.label }}
+            {% if field.field.required %}<span class="required">*</span>{% endif %}
+          </label>
+          {{ field }}
+          {% if field.help_text %}
+          <span class="form-help">{{ field.help_text }}</span>
+          {% endif %}
+          {% for error in field.errors %}
+          <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+        {% endfor %}
+
+        <!-- File Upload Drop Zone -->
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-inner">
+            <span class="drop-icon">📁</span>
+            <p class="drop-text">Drag &amp; drop your file here, or <span class="drop-link">browse</span></p>
+            <p class="drop-hint">PDF, DOC, DOCX, PPT, PPTX, XLS, ZIP, Images, TXT — max 50MB</p>
+          </div>
+          <div class="drop-preview" id="dropPreview" style="display:none">
+            <span class="drop-file-icon" id="dropFileIcon">📄</span>
+            <span class="drop-file-name" id="dropFileName"></span>
+            <span class="drop-file-size" id="dropFileSize"></span>
+          </div>
+        </div>
+
+        <div class="upload-progress" id="uploadProgress" style="display:none">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <span class="progress-text" id="progressText">Uploading…</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-full" id="submitBtn">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Upload Resource
+        </button>
+      </form>
+    </div>
+
+    <div class="upload-tips">
+      <div class="tips-card">
+        <h3>📝 Upload Tips</h3>
+        <ul>
+          <li>Use a clear, descriptive title</li>
+          <li>Select the correct course</li>
+          <li>Type your subject or pick a suggestion</li>
+          <li>Add a description so others know what to expect</li>
+          <li>PDFs are the most accessible format</li>
+          <li>Max file size is 50MB</li>
+        </ul>
+      </div>
+      <div class="tips-card tips-card-accent">
+        <h3>🐄 StudyMoo Promise</h3>
+        <p>All resources are freely available to every student. Share generously!</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile_user.username }} — StudyMoo{% endblock %}
+
+{% block content %}
+<div class="container profile-page">
+
+  <!-- Profile Header -->
+  <div class="profile-header-card">
+    <div class="profile-avatar-lg">{{ profile_user.username|first|upper }}</div>
+    <div class="profile-info">
+      <h1 class="profile-name">
+        {% if profile_user.first_name %}{{ profile_user.first_name }} {{ profile_user.last_name }}{% else %}{{ profile_user.username }}{% endif %}
+      </h1>
+      <p class="profile-username">@{{ profile_user.username }}</p>
+      {% if profile.bio %}
+      <p class="profile-bio">{{ profile.bio }}</p>
+      {% endif %}
+      <div class="profile-stats">
+        <div class="pstat">
+          <span class="pstat-num">{{ uploads.count }}</span>
+          <span class="pstat-label">Uploads</span>
+        </div>
+        <div class="pstat">
+          <span class="pstat-num">{{ profile.total_downloads }}</span>
+          <span class="pstat-label">Total Downloads</span>
+        </div>
+        <div class="pstat">
+          <span class="pstat-num">{{ profile_user.date_joined|date:"Y" }}</span>
+          <span class="pstat-label">Member Since</span>
+        </div>
+      </div>
+    </div>
+    {% if user == profile_user %}
+    <div class="profile-actions">
+      <a href="{% url 'edit_profile' %}" class="btn btn-outline btn-sm">Edit Profile</a>
+      <a href="{% url 'upload_resource' %}" class="btn btn-primary btn-sm">Upload Resource</a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Uploads Section -->
+  <div class="profile-uploads">
+    <h2 class="section-title">
+      Uploaded Resources
+      <span class="count-badge">{{ uploads.count }}</span>
+    </h2>
+
+    {% if uploads %}
+    <div class="resource-grid">
+      {% for resource in uploads %}
+      <article class="resource-card">
+        <div class="card-top">
+          <div class="card-ext {{ resource.file_extension }}">{{ resource.file_extension|upper }}</div>
+          <span class="card-subject-tag">{{ resource.subject }}</span>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">
+            <a href="{% url 'resource_detail' resource.pk %}">{{ resource.title }}</a>
+          </h3>
+          {% if resource.description %}
+          <p class="card-desc">{{ resource.description|truncatechars:80 }}</p>
+          {% endif %}
+        </div>
+        <div class="card-footer">
+          <div class="card-meta">
+            {% if resource.course %}
+            <span class="meta-tag course-tag">{{ resource.course.name }}</span>
+            {% endif %}
+            <span class="meta-dl">↓ {{ resource.download_count }}</span>
+          </div>
+          <div class="card-actions">
+            <a href="{% url 'resource_detail' resource.pk %}" class="btn btn-sm btn-outline">View</a>
+            {% if user == profile_user %}
+            <a href="{% url 'delete_resource' resource.pk %}" class="btn btn-sm btn-ghost text-danger">Delete</a>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <span class="empty-emoji">📚</span>
+      <h3>No uploads yet</h3>
+      {% if user == profile_user %}
+      <p>You haven't uploaded any resources yet. Share your notes with classmates!</p>
+      <a href="{% url 'upload_resource' %}" class="btn btn-primary">Upload Your First Resource</a>
+      {% else %}
+      <p>{{ profile_user.username }} hasn't uploaded any resources yet.</p>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

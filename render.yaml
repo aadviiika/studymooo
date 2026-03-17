@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: studymoo
+    runtime: python
+    buildCommand: "pip install -r studymoo_project/requirements.txt && python studymoo_project/manage.py collectstatic --noinput"
+    startCommand: "python studymoo_project/manage.py migrate && gunicorn --bind 0.0.0.0:$PORT studymoo_project.wsgi:application"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: PYTHON_VERSION
+        value: "3.12.0"

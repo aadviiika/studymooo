@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% block title %}StudyMoo — Browse Study Resources{% endblock %}
+
+{% block content %}
+
+{% if not query and not course_filter and not subject_filter %}
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-badge">🎓 Free Academic Resources</div>
+      <h1 class="hero-title">Your college notes,<br><span class="gradient-text">organized &amp; shared.</span></h1>
+      <p class="hero-sub">Upload your notes, download exam papers, and help your classmates succeed.</p>
+      <div class="hero-actions">
+        {% if user.is_authenticated %}
+          <a href="{% url 'upload_resource' %}" class="btn btn-primary btn-lg">Upload a Resource</a>
+        {% else %}
+          <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Get Started Free</a>
+        {% endif %}
+        <a href="#browse" class="btn btn-outline btn-lg">Browse Resources</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="cow-card">
+        <span class="cow-emoji">🐄</span>
+        <div class="cow-lines">
+          <div class="cow-line"></div>
+          <div class="cow-line short"></div>
+          <div class="cow-line"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat">
+      <span class="stat-num">{{ total_count }}+</span>
+      <span class="stat-label">Resources</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">{{ courses|length }}</span>
+      <span class="stat-label">Courses</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">Free</span>
+      <span class="stat-label">Always</span>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if query or course_filter or subject_filter %}
+<section class="search-header">
+  <div class="container">
+    <h2 class="search-title">
+      {% if query %}Results for "<em>{{ query }}</em>"{% else %}Filtered Resources{% endif %}
+    </h2>
+    <p>{{ total_count }} resource{{ total_count|pluralize }} found
+      {% if subject_filter %}· {{ subject_filter }}{% endif %}
+    </p>
+    <a href="{% url 'home' %}" class="btn btn-ghost btn-sm">× Clear filters</a>
+  </div>
+</section>
+{% endif %}
+
+<section class="browse-section" id="browse">
+  <div class="container">
+
+    {% if not query and not course_filter and not subject_filter and trending %}
+    <div class="section-header">
+      <h2 class="section-title">🔥 Trending This Week</h2>
+    </div>
+    <div class="trending-row">
+      {% for res in trending %}
+      <a href="{% url 'resource_detail' res.pk %}" class="trending-chip">
+        <span class="trending-ext {{ res.file_extension }}">{{ res.file_extension|upper }}</span>
+        <span class="trending-title">{{ res.title|truncatechars:40 }}</span>
+        <span class="trending-dl">↓ {{ res.download_count }}</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Filters -->
+    <div class="filters-bar">
+      <form method="GET" action="{% url 'home' %}" class="filter-form">
+        {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+        <input type="text" name="subject" class="filter-select"
+               placeholder="Filter by subject…"
+               value="{{ subject_filter }}"
+               list="subject-filter-list"
+               autocomplete="off">
+        <datalist id="subject-filter-list">
+          <option value="Lecture Notes">
+          <option value="Assignment">
+          <option value="Previous Exam Paper">
+          <option value="Textbook / Reference">
+          <option value="Project">
+          <option value="Lab Report">
+          <option value="Tutorial Sheet">
+          <option value="Cheat Sheet">
+        </datalist>
+        <select name="course" class="filter-select" onchange="this.form.submit()">
+          <option value="">All Courses</option>
+          {% for c in courses %}
+          <option value="{{ c.id }}" {% if course_filter == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" class="btn btn-outline btn-sm">Apply</button>
+      </form>
+      <p class="results-count">{{ total_count }} resource{{ total_count|pluralize }}</p>
+    </div>
+
+    {% if resources %}
+    <div class="resource-grid" id="resourceGrid">
+      {% for resource in resources %}
+      <article class="resource-card">
+        <div class="card-top">
+          <div class="card-ext {{ resource.file_extension }}">{{ resource.file_extension|upper }}</div>
+          <span class="card-subject-tag">{{ resource.subject }}</span>
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">
+            <a href="{% url 'resource_detail' resource.pk %}">{{ resource.title }}</a>
+          </h3>
+          {% if resource.description %}
+          <p class="card-desc">{{ resource.description|truncatechars:90 }}</p>
+          {% endif %}
+        </div>
+        <div class="card-footer">
+          <div class="card-meta">
+            {% if resource.course %}
+            <span class="meta-tag course-tag">{{ resource.course.name }}</span>
+            {% endif %}
+            <span class="meta-dl">↓ {{ resource.download_count }}</span>
+          </div>
+          <div class="card-actions">
+            <a href="{% url 'resource_detail' resource.pk %}" class="btn btn-sm btn-outline">View</a>
+            <a href="{% url 'download_resource' resource.pk %}" class="btn btn-sm btn-primary">Download</a>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <span class="empty-emoji">📂</span>
+      <h3>No resources found</h3>
+      <p>{% if query %}No resources match "{{ query }}".{% else %}No resources uploaded yet.{% endif %}</p>
+      {% if user.is_authenticated %}
+        <a href="{% url 'upload_resource' %}" class="btn btn-primary">Be the first to upload!</a>
+      {% else %}
+        <a href="{% url 'register' %}" class="btn btn-primary">Join and upload</a>
+      {% endif %}
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

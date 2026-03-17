@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Delete Resource — StudyMoo{% endblock %}
+
+{% block content %}
+<div class="container auth-page">
+  <div class="auth-card">
+    <div class="auth-header">
+      <span class="auth-mascot">⚠️</span>
+      <h1>Delete Resource</h1>
+      <p>This action cannot be undone.</p>
+    </div>
+    <div class="delete-info">
+      <p>Are you sure you want to delete <strong>"{{ resource.title }}"</strong>?</p>
+      <p class="text-muted">The file and all download data will be permanently removed.</p>
+    </div>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-actions">
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'resource_detail' resource.pk %}" class="btn btn-ghost">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

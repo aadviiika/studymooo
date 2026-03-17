@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}StudyMoo — Share knowledge. Learn together.{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐄</text></svg>">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="{% url 'home' %}" class="nav-brand">
+      <span class="mascot">🐄</span>
+      <span class="brand-text">Study<span class="brand-accent">Moo</span></span>
+    </a>
+    <form class="nav-search" action="{% url 'home' %}" method="GET">
+      <input type="text" name="q" placeholder="Search notes, exams, assignments…" value="{{ request.GET.q }}" class="search-input" autocomplete="off">
+      <button type="submit" class="search-btn">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </button>
+    </form>
+    <div class="nav-links">
+      {% if user.is_authenticated %}
+        <a href="{% url 'upload_resource' %}" class="btn btn-primary btn-sm">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload
+        </a>
+        <div class="nav-user-menu">
+          <a href="{% url 'profile' username=user.username %}" class="nav-avatar">{{ user.username|first|upper }}</a>
+          <div class="dropdown-menu">
+            <a href="{% url 'profile' username=user.username %}">My Profile</a>
+            <a href="{% url 'edit_profile' %}">Edit Profile</a>
+            <hr>
+            <a href="{% url 'logout' %}">Sign Out</a>
+          </div>
+        </div>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-ghost btn-sm">Sign In</a>
+        <a href="{% url 'register' %}" class="btn btn-primary btn-sm">Join Free</a>
+      {% endif %}
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-search" id="mobileSearch">
+    <form action="{% url 'home' %}" method="GET">
+      <input type="text" name="q" placeholder="Search resources…" value="{{ request.GET.q }}">
+      <button type="submit">Search</button>
+    </form>
+  </div>
+</nav>
+
+{% if messages %}
+<div class="messages-container">
+  {% for message in messages %}
+  <div class="message message-{{ message.tags }}" data-auto-dismiss>
+    <span>{{ message }}</span>
+    <button onclick="this.parentElement.remove()" class="msg-close">×</button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<main class="main-content">{% block content %}{% endblock %}</main>
+
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-brand"><span class="mascot">🐄</span><span>StudyMoo</span></div>
+    <p class="footer-tagline">Share knowledge. Learn together.</p>
+    <div class="footer-links">
+      <a href="{% url 'home' %}">Browse Resources</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'upload_resource' %}">Upload</a>
+        <a href="{% url 'profile' username=user.username %}">Profile</a>
+      {% else %}
+        <a href="{% url 'register' %}">Join Free</a>
+        <a href="{% url 'login' %}">Sign In</a>
+      {% endif %}
+    </div>
+    <p class="footer-copy">© 2025 StudyMoo. Built for students, by students.</p>
+  </div>
+</footer>
+
+<script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
