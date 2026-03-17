@@ -14,19 +14,6 @@
       <form method="POST" enctype="multipart/form-data" id="uploadForm">
         {% csrf_token %}
 
-        <!-- datalist for subject suggestions -->
-        <datalist id="subject-suggestions">
-          <option value="Lecture Notes">
-          <option value="Assignment">
-          <option value="Previous Exam Paper">
-          <option value="Textbook / Reference">
-          <option value="Project">
-          <option value="Lab Report">
-          <option value="Tutorial Sheet">
-          <option value="Cheat Sheet">
-          <option value="Other">
-        </datalist>
-
         {% for field in form %}
         <div class="form-group {% if field.errors %}has-error{% endif %}">
           <label class="form-label" for="{{ field.id_for_label }}">
@@ -43,7 +30,6 @@
         </div>
         {% endfor %}
 
-        <!-- File Upload Drop Zone -->
         <div class="drop-zone" id="dropZone">
           <div class="drop-inner">
             <span class="drop-icon">📁</span>
@@ -58,9 +44,7 @@
         </div>
 
         <div class="upload-progress" id="uploadProgress" style="display:none">
-          <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-          </div>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
           <span class="progress-text" id="progressText">Uploading…</span>
         </div>
 
@@ -80,8 +64,8 @@
         <h3>📝 Upload Tips</h3>
         <ul>
           <li>Use a clear, descriptive title</li>
-          <li>Select the correct course</li>
-          <li>Type your subject or pick a suggestion</li>
+          <li>Type the course name freely</li>
+          <li>Choose the correct notes type</li>
           <li>Add a description so others know what to expect</li>
           <li>PDFs are the most accessible format</li>
           <li>Max file size is 50MB</li>

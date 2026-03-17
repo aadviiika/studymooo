@@ -24,22 +24,25 @@ class RegisterForm(UserCreationForm):
 
 
 class ResourceUploadForm(forms.ModelForm):
-    subject = forms.CharField(
-        max_length=100,
-        initial='Lecture Notes',
-        widget=forms.TextInput(attrs={
-            'list': 'subject-suggestions',
-            'placeholder': 'e.g. Lecture Notes, Exam Paper, Lab Report…',
-            'autocomplete': 'off',
-        })
-    )
-
     class Meta:
         model = Resource
-        fields = ['title', 'description', 'file_upload', 'course', 'subject']
+        fields = ['title', 'description', 'file_upload', 'course_name', 'notes_type']
         widgets = {
-            'title': forms.TextInput(attrs={'placeholder': 'e.g. Data Structures Final Notes'}),
-            'description': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Briefly describe this resource…'}),
+            'title': forms.TextInput(attrs={
+                'placeholder': 'e.g. Data Structures Final Notes'
+            }),
+            'description': forms.Textarea(attrs={
+                'rows': 4,
+                'placeholder': 'Briefly describe this resource…'
+            }),
+            'course_name': forms.TextInput(attrs={
+                'placeholder': 'e.g. Data Structures, Calculus II, Organic Chemistry…'
+            }),
+            'notes_type': forms.Select(),
+        }
+        labels = {
+            'course_name': 'Course Name',
+            'notes_type': 'Notes Type',
         }
 
     def clean_file_upload(self):

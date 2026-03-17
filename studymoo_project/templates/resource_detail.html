@@ -7,15 +7,14 @@
   <nav class="breadcrumb">
     <a href="{% url 'home' %}">Home</a>
     <span>›</span>
-    {% if resource.course %}
-    <a href="{% url 'home' %}?course={{ resource.course.id }}">{{ resource.course.name }}</a>
+    {% if resource.course_name %}
+    <span>{{ resource.course_name }}</span>
     <span>›</span>
     {% endif %}
     <span>{{ resource.title|truncatechars:40 }}</span>
   </nav>
 
   <div class="detail-layout">
-
     <div class="detail-main">
       <div class="detail-card">
         <div class="detail-header">
@@ -23,9 +22,9 @@
           <div class="detail-header-text">
             <h1 class="detail-title">{{ resource.title }}</h1>
             <div class="detail-tags">
-              <span class="tag tag-subject">{{ resource.subject }}</span>
-              {% if resource.course %}
-              <span class="tag tag-course">{{ resource.course.name }}</span>
+              <span class="tag tag-subject">{{ resource.notes_type }}</span>
+              {% if resource.course_name %}
+              <span class="tag tag-course">{{ resource.course_name }}</span>
               {% endif %}
             </div>
           </div>
@@ -74,7 +73,6 @@
         </div>
       </div>
 
-      <!-- PDF Preview -->
       {% if resource.is_pdf %}
       <div class="pdf-preview-card">
         <div class="preview-header">
@@ -82,11 +80,8 @@
           <span class="preview-note">PDF preview — download for best quality</span>
         </div>
         <div class="pdf-container">
-          <iframe src="{{ resource.file_upload.url }}"
-                  width="100%"
-                  height="650px"
-                  title="PDF Preview: {{ resource.title }}"
-                  loading="lazy">
+          <iframe src="{{ resource.file_upload.url }}" width="100%" height="650px"
+                  title="PDF Preview: {{ resource.title }}" loading="lazy">
             <p>Your browser doesn't support inline PDF preview.
                <a href="{% url 'download_resource' resource.pk %}">Download the PDF</a> to view it.
             </p>
@@ -95,7 +90,6 @@
       </div>
       {% endif %}
 
-      <!-- Notes (TXT) Preview -->
       {% if notes_preview %}
       <div class="pdf-preview-card">
         <div class="preview-header">
@@ -105,10 +99,8 @@
         <pre class="notes-preview-body">{{ notes_preview }}</pre>
       </div>
       {% endif %}
-
     </div>
 
-    <!-- Sidebar -->
     <aside class="detail-sidebar">
       {% if related %}
       <div class="sidebar-card">
@@ -119,7 +111,7 @@
             <span class="related-ext {{ r.file_extension }}">{{ r.file_extension|upper }}</span>
             <div class="related-info">
               <span class="related-title">{{ r.title|truncatechars:45 }}</span>
-              <span class="related-sub">{{ r.subject }} · ↓ {{ r.download_count }}</span>
+              <span class="related-sub">{{ r.notes_type }} · ↓ {{ r.download_count }}</span>
             </div>
           </a>
           {% endfor %}
@@ -138,7 +130,6 @@
         </a>
       </div>
     </aside>
-
   </div>
 </div>
 {% endblock %}

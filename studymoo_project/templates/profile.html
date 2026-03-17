@@ -4,7 +4,6 @@
 {% block content %}
 <div class="container profile-page">
 
-  <!-- Profile Header -->
   <div class="profile-header-card">
     <div class="profile-avatar-lg">{{ profile_user.username|first|upper }}</div>
     <div class="profile-info">
@@ -12,9 +11,7 @@
         {% if profile_user.first_name %}{{ profile_user.first_name }} {{ profile_user.last_name }}{% else %}{{ profile_user.username }}{% endif %}
       </h1>
       <p class="profile-username">@{{ profile_user.username }}</p>
-      {% if profile.bio %}
-      <p class="profile-bio">{{ profile.bio }}</p>
-      {% endif %}
+      {% if profile.bio %}<p class="profile-bio">{{ profile.bio }}</p>{% endif %}
       <div class="profile-stats">
         <div class="pstat">
           <span class="pstat-num">{{ uploads.count }}</span>
@@ -38,7 +35,6 @@
     {% endif %}
   </div>
 
-  <!-- Uploads Section -->
   <div class="profile-uploads">
     <h2 class="section-title">
       Uploaded Resources
@@ -51,21 +47,21 @@
       <article class="resource-card">
         <div class="card-top">
           <div class="card-ext {{ resource.file_extension }}">{{ resource.file_extension|upper }}</div>
-          <span class="card-subject-tag">{{ resource.subject }}</span>
+          <span class="card-subject-tag">{{ resource.notes_type }}</span>
         </div>
         <div class="card-body">
           <h3 class="card-title">
             <a href="{% url 'resource_detail' resource.pk %}">{{ resource.title }}</a>
           </h3>
+          {% if resource.course_name %}
+          <p class="card-course">📚 {{ resource.course_name }}</p>
+          {% endif %}
           {% if resource.description %}
           <p class="card-desc">{{ resource.description|truncatechars:80 }}</p>
           {% endif %}
         </div>
         <div class="card-footer">
           <div class="card-meta">
-            {% if resource.course %}
-            <span class="meta-tag course-tag">{{ resource.course.name }}</span>
-            {% endif %}
             <span class="meta-dl">↓ {{ resource.download_count }}</span>
           </div>
           <div class="card-actions">
@@ -83,10 +79,10 @@
       <span class="empty-emoji">📚</span>
       <h3>No uploads yet</h3>
       {% if user == profile_user %}
-      <p>You haven't uploaded any resources yet. Share your notes with classmates!</p>
+      <p>You haven't uploaded any resources yet.</p>
       <a href="{% url 'upload_resource' %}" class="btn btn-primary">Upload Your First Resource</a>
       {% else %}
-      <p>{{ profile_user.username }} hasn't uploaded any resources yet.</p>
+      <p>{{ profile_user.username }} hasn't uploaded anything yet.</p>
       {% endif %}
     </div>
     {% endif %}

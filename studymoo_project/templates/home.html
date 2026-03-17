@@ -3,7 +3,7 @@
 
 {% block content %}
 
-{% if not query and not course_filter and not subject_filter %}
+{% if not query and not type_filter %}
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-text">
@@ -36,10 +36,6 @@
       <span class="stat-label">Resources</span>
     </div>
     <div class="stat">
-      <span class="stat-num">{{ courses|length }}</span>
-      <span class="stat-label">Courses</span>
-    </div>
-    <div class="stat">
       <span class="stat-num">Free</span>
       <span class="stat-label">Always</span>
     </div>
@@ -47,14 +43,14 @@
 </section>
 {% endif %}
 
-{% if query or course_filter or subject_filter %}
+{% if query or type_filter %}
 <section class="search-header">
   <div class="container">
     <h2 class="search-title">
       {% if query %}Results for "<em>{{ query }}</em>"{% else %}Filtered Resources{% endif %}
     </h2>
     <p>{{ total_count }} resource{{ total_count|pluralize }} found
-      {% if subject_filter %}· {{ subject_filter }}{% endif %}
+      {% if type_filter %}· {{ type_filter }}{% endif %}
     </p>
     <a href="{% url 'home' %}" class="btn btn-ghost btn-sm">× Clear filters</a>
   </div>
@@ -64,7 +60,7 @@
 <section class="browse-section" id="browse">
   <div class="container">
 
-    {% if not query and not course_filter and not subject_filter and trending %}
+    {% if not query and not type_filter and trending %}
     <div class="section-header">
       <h2 class="section-title">🔥 Trending This Week</h2>
     </div>
@@ -83,25 +79,10 @@
     <div class="filters-bar">
       <form method="GET" action="{% url 'home' %}" class="filter-form">
         {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
-        <input type="text" name="subject" class="filter-select"
-               placeholder="Filter by subject…"
-               value="{{ subject_filter }}"
-               list="subject-filter-list"
-               autocomplete="off">
-        <datalist id="subject-filter-list">
-          <option value="Lecture Notes">
-          <option value="Assignment">
-          <option value="Previous Exam Paper">
-          <option value="Textbook / Reference">
-          <option value="Project">
-          <option value="Lab Report">
-          <option value="Tutorial Sheet">
-          <option value="Cheat Sheet">
-        </datalist>
-        <select name="course" class="filter-select" onchange="this.form.submit()">
-          <option value="">All Courses</option>
-          {% for c in courses %}
-          <option value="{{ c.id }}" {% if course_filter == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+        <select name="notes_type" class="filter-select" onchange="this.form.submit()">
+          <option value="">All Types</option>
+          {% for val, label in notes_type_choices %}
+          <option value="{{ val }}" {% if type_filter == val %}selected{% endif %}>{{ label }}</option>
           {% endfor %}
         </select>
         <button type="submit" class="btn btn-outline btn-sm">Apply</button>
@@ -110,26 +91,26 @@
     </div>
 
     {% if resources %}
-    <div class="resource-grid" id="resourceGrid">
+    <div class="resource-grid">
       {% for resource in resources %}
       <article class="resource-card">
         <div class="card-top">
           <div class="card-ext {{ resource.file_extension }}">{{ resource.file_extension|upper }}</div>
-          <span class="card-subject-tag">{{ resource.subject }}</span>
+          <span class="card-subject-tag">{{ resource.notes_type }}</span>
         </div>
         <div class="card-body">
           <h3 class="card-title">
             <a href="{% url 'resource_detail' resource.pk %}">{{ resource.title }}</a>
           </h3>
+          {% if resource.course_name %}
+          <p class="card-course">📚 {{ resource.course_name }}</p>
+          {% endif %}
           {% if resource.description %}
-          <p class="card-desc">{{ resource.description|truncatechars:90 }}</p>
+          <p class="card-desc">{{ resource.description|truncatechars:80 }}</p>
           {% endif %}
         </div>
         <div class="card-footer">
           <div class="card-meta">
-            {% if resource.course %}
-            <span class="meta-tag course-tag">{{ resource.course.name }}</span>
-            {% endif %}
             <span class="meta-dl">↓ {{ resource.download_count }}</span>
           </div>
           <div class="card-actions">

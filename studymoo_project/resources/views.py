@@ -8,7 +8,7 @@ from django.http import FileResponse, Http404
 from django.db.models import Q
 import os
 
-from .models import Resource, Course, Profile
+from .models import Resource, Profile
 from .forms import RegisterForm, ResourceUploadForm, ProfileEditForm
 
 
@@ -19,43 +19,36 @@ def get_or_create_profile(user):
 
 def home(request):
     query = request.GET.get('q', '').strip()
-    course_filter = request.GET.get('course', '')
-    subject_filter = request.GET.get('subject', '').strip()
+    type_filter = request.GET.get('notes_type', '').strip()
 
-    resources = Resource.objects.select_related('course', 'uploaded_by').all()
+    resources = Resource.objects.select_related('uploaded_by').all()
 
     if query:
         resources = resources.filter(
             Q(title__icontains=query) |
             Q(description__icontains=query) |
-            Q(subject__icontains=query) |
-            Q(course__name__icontains=query) |
-            Q(course__code__icontains=query)
+            Q(course_name__icontains=query) |
+            Q(notes_type__icontains=query)
         )
-    if course_filter:
-        resources = resources.filter(course__id=course_filter)
-    if subject_filter:
-        resources = resources.filter(subject__icontains=subject_filter)
+    if type_filter:
+        resources = resources.filter(notes_type=type_filter)
 
     trending = Resource.objects.order_by('-download_count')[:5]
-    recent = resources[:12]
-    courses = Course.objects.all()
 
     return render(request, 'home.html', {
-        'resources': recent,
+        'resources': resources[:12],
         'trending': trending,
-        'courses': courses,
         'query': query,
-        'course_filter': course_filter,
-        'subject_filter': subject_filter,
+        'type_filter': type_filter,
         'total_count': resources.count(),
+        'notes_type_choices': Resource.NOTES_TYPE_CHOICES,
     })
 
 
 def resource_detail(request, pk):
-    resource = get_object_or_404(Resource.objects.select_related('course', 'uploaded_by'), pk=pk)
+    resource = get_object_or_404(Resource.objects.select_related('uploaded_by'), pk=pk)
     related = Resource.objects.filter(
-        Q(course=resource.course) | Q(subject__icontains=resource.subject)
+        Q(course_name__icontains=resource.course_name) | Q(notes_type=resource.notes_type)
     ).exclude(pk=pk)[:4]
 
     notes_preview = None
@@ -144,7 +137,7 @@ def logout_view(request):
 def profile_view(request, username):
     user = get_object_or_404(User, username=username)
     profile = get_or_create_profile(user)
-    uploads = Resource.objects.filter(uploaded_by=user).select_related('course').order_by('-uploaded_at')
+    uploads = Resource.objects.filter(uploaded_by=user).order_by('-uploaded_at')
     return render(request, 'profile.html', {
         'profile_user': user,
         'profile': profile,
