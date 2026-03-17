@@ -8,12 +8,12 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Remove old fields
+        # Remove old Resource fields
         migrations.RemoveField(model_name='resource', name='course'),
         migrations.RemoveField(model_name='resource', name='subject'),
         # Remove Course model
         migrations.DeleteModel(name='Course'),
-        # Add new fields
+        # Add new Resource fields
         migrations.AddField(
             model_name='resource',
             name='course_name',
@@ -32,5 +32,10 @@ class Migration(migrations.Migration):
                 default='Lecture Notes',
                 max_length=50,
             ),
+        ),
+        # Remove avatar_initial_color from Profile
+        migrations.RemoveField(
+            model_name='profile',
+            name='avatar_initial_color',
         ),
     ]
